@@ -14,6 +14,8 @@
 * fas.tmp输出名字表
 */
 
+#pragma warning(disable : 4996)//这个是额外添加的，关闭Visual Studio中的安全警告，不用Visual Studio可以删掉。
+
 #include<stdio.h>
 #include "pl0.h"
 #include "string.h"
