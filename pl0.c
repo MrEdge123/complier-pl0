@@ -101,18 +101,19 @@ void init() {
     strcpy(&(word[2][0]), "const");
     strcpy(&(word[3][0]), "do");
     strcpy(&(word[4][0]), "downto");
-    strcpy(&(word[5][0]), "end");
-    strcpy(&(word[6][0]), "for");
-    strcpy(&(word[7][0]), "if");
-    strcpy(&(word[8][0]), "odd");
-    strcpy(&(word[9][0]), "procedure");
-    strcpy(&(word[10][0]), "read");
-    strcpy(&(word[11][0]), "return");
-    strcpy(&(word[12][0]), "then");
-    strcpy(&(word[13][0]), "to");
-    strcpy(&(word[14][0]), "var");
-    strcpy(&(word[15][0]), "while");
-    strcpy(&(word[16][0]), "write");
+    strcpy(&(word[5][0]), "else");
+    strcpy(&(word[6][0]), "end");
+    strcpy(&(word[7][0]), "for");
+    strcpy(&(word[8][0]), "if");
+    strcpy(&(word[9][0]), "odd");
+    strcpy(&(word[10][0]), "procedure");
+    strcpy(&(word[11][0]), "read");
+    strcpy(&(word[12][0]), "return");
+    strcpy(&(word[13][0]), "then");
+    strcpy(&(word[14][0]), "to");
+    strcpy(&(word[15][0]), "var");
+    strcpy(&(word[16][0]), "while");
+    strcpy(&(word[17][0]), "write");
 
     /*设置保留字符号*/
     wsym[0] = beginsym;
@@ -120,18 +121,19 @@ void init() {
     wsym[2] = constsym;
     wsym[3] = dosym;
     wsym[4] = downtosym;
-    wsym[5] = endsym;
-    wsym[6] = forsym;
-    wsym[7] = ifsym;
-    wsym[8] = oddsym;
-    wsym[9] = procsym;
-    wsym[10] = readsym;
-    wsym[11] = returnsym;
-    wsym[12] = thensym;
-    wsym[13] = tosym;
-    wsym[14] = varsym;
-    wsym[15] = whilesym;
-    wsym[16] = writesym;
+    wsym[5] = elsesym;
+    wsym[6] = endsym;
+    wsym[7] = forsym;
+    wsym[8] = ifsym;
+    wsym[9] = oddsym;
+    wsym[10] = procsym;
+    wsym[11] = readsym;
+    wsym[12] = returnsym;
+    wsym[13] = thensym;
+    wsym[14] = tosym;
+    wsym[15] = varsym;
+    wsym[16] = whilesym;
+    wsym[17] = writesym;
     /*设置指令名称*/
     strcpy(&(mnemonic[lit][0]), "lit");
     strcpy(&(mnemonic[opr][0]), "opr");
@@ -276,7 +278,8 @@ int getsym() {
         } while (i <= j);
         if (i - 1 > j) {
             sym = wsym[k];
-            if (sym == forsym || sym == tosym || sym == downtosym || sym == returnsym) {
+            if (sym == forsym || sym == tosym ||
+            sym == downtosym || sym == returnsym || sym == elsesym) {
                 printf("do not support %s!\n", word[k]);
             }
         } else {
