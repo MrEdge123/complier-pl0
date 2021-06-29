@@ -279,7 +279,7 @@ int getsym() {
         if (i - 1 > j) {
             sym = wsym[k];
             if (sym == forsym || sym == tosym ||
-            sym == downtosym || sym == returnsym || sym == elsesym) {
+            sym == downtosym || sym == returnsym) {
                 printf("do not support %s!\n", word[k]);
             }
         } else {
@@ -784,6 +784,15 @@ int statement(bool *fsys, int *ptx, int lev) {
                         statementdo(fsys, ptx, lev);
                         code[cx1].a = cx;
 
+                        if (sym == elsesym) {
+                            getsymdo;
+                            code[cx1].a = cx + 1;  // 设置else代码的开始地址
+
+                            cx1 = cx;
+                            gendo(jmp, 0, 0);
+                            statementdo(fsys, ptx, lev);
+                            code[cx1].a = cx;
+                        }
 
                     } else {
                         if (sym == beginsym)        /*准备按照复合语句处理*/

@@ -1,0 +1,7 @@
+var num;
+begin
+    read(num);
+    if num = 0 then write(0)
+    else write(1);
+    write(0)
+end.
