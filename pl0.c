@@ -94,7 +94,6 @@ void init() {
     ssym['='] = eql;
     ssym[','] = comma;
     ssym['.'] = period;
-    ssym['#'] = neq;
     ssym[';'] = semicolon;
     /* 设置保留字名字，按照字母顺序，便于折半查找；*/
     strcpy(&(word[0][0]), "begin");
@@ -308,11 +307,14 @@ int getsym() {
                     sym = nul;   /*不能识别的符号*/
                 }
             } else {
-                if (ch == '<') /*检测小于或小于等于符号*/
+                if (ch == '<') /*检测小于, 小于等于或不等于符号*/
                 {
                     getchdo;
                     if (ch == '=') {
                         sym = leq;
+                        getchdo;
+                    } else if (ch == '>') {
+                        sym = neq;
                         getchdo;
                     } else {
                         sym = lss;
