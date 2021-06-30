@@ -1,0 +1,7 @@
+var i;
+begin
+    for i := 9 downto 1 do
+        begin
+            write(i)
+        end
+end.

@@ -278,8 +278,7 @@ int getsym() {
         } while (i <= j);
         if (i - 1 > j) {
             sym = wsym[k];
-            if (sym == forsym || sym == tosym ||
-            sym == downtosym || sym == returnsym) {
+            if (sym == returnsym) {
                 printf("do not support %s!\n", word[k]);
             }
         } else {
@@ -847,10 +846,95 @@ int statement(bool *fsys, int *ptx, int lev) {
                                 gendo(jmp, 0, cx1);
                                 code[cx2].a = cx;  /* 反填跳出循环的地址，与if类似 */
                             } else {
-                                memset(nxtlev, 0, sizeof(bool) * symnum); /* 语句结束无补救集合*/
+                                if (sym == forsym) {
+                                    getsymdo;
 
-                                testdo(fsys, nxtlev, 19); /* 检测语句结束的正确性 */
+                                    // 处理变量
+                                    if (sym != ident) {
+                                        error(40); // for后面不是标识符
+                                        return 0;
+                                    }
+                                    i = position(id, *ptx);
+                                    if (i == 0) {
+                                        error(11); // 变量未找到
+                                        return 0;
+                                    }
+                                    if (table[i].kind != variable) {
+                                        error(12); // 赋值语句格式错误
+                                        i = 0;
+                                        return 0;
+                                    }
+                                    getsymdo;
 
+                                    if (sym != becomes) {
+                                        error(41); // 不是单赋值符号
+                                        return 0;
+                                    }
+                                    getsymdo;
+                                    // 处理初值
+                                    memcpy(nxtlev, fsys, sizeof(bool) * symnum);
+                                    expressiondo(nxtlev, ptx, lev); // 处理赋值符号右侧表达式，结果放在栈顶
+                                    // 执行sto命令，将栈顶的值赋值到变量
+                                    gendo(sto, lev - table[i].level, table[i].adr);
+
+                                    // 识别 to/downto
+                                    bool flagStep;
+                                    if (sym == tosym) {
+                                        flagStep = true;
+                                    } else if (sym == downtosym) {
+                                        flagStep = false;
+                                    } else {
+                                        error(42); // 不是to/downto
+                                        return 0;
+                                    }
+                                    getsymdo;
+
+                                    // 设置 jmp 指令的跳转地址
+                                    cx1 = cx;
+
+                                    // 先取值变量的值到栈顶
+                                    gendo(lod, lev - table[i].level, table[i].adr);
+                                    // 处理终值
+                                    memcpy(nxtlev, fsys, sizeof(bool) * symnum);
+                                    expressiondo(nxtlev, ptx, lev); // 处理表达式，结果放在栈顶
+                                    // 比较是否满足条件
+                                    if (flagStep) {
+                                        gendo(opr, 0, 13);  // 次栈顶是否小于等于栈顶
+                                    } else {
+                                        gendo(opr, 0, 11);  // 次栈顶是否大于等于栈顶
+                                    }
+                                    // 生成条件跳转指令
+                                    cx2 = cx;
+                                    gendo(jpc, 0, 0);
+
+                                    // 识别 do
+                                    if (sym != dosym) {
+                                        error(18);
+                                        return 0;
+                                    }
+                                    getsymdo;
+
+                                    // 处理语句
+                                    statementdo(fsys, ptx, lev);
+
+                                    // 生成改变循环变量的指令
+                                    gendo(lod, lev - table[i].level, table[i].adr);
+                                    gendo(lit, 0, 2);  // 步长为2
+                                    if (flagStep) {
+                                        gendo(opr, 0, 2);  // 增加
+                                    } else {
+                                        gendo(opr, 0, 3);  // 减少
+                                    }
+                                    gendo(sto, lev - table[i].level, table[i].adr);
+
+                                    gendo(jmp, 0, cx1);  // 生成跳转指令，开始下一轮循环
+                                    code[cx2].a = cx;  // 回填跳出循环的地址
+                                    return 0;
+
+                                } else {
+                                    memset(nxtlev, 0, sizeof(bool) * symnum); /* 语句结束无补救集合*/
+                                    testdo(fsys, nxtlev, 19); /* 检测语句结束的正确性 */
+                                }
                             }
                         }
                     }
