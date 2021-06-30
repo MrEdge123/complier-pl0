@@ -1,0 +1,6 @@
+var a;
+begin
+    read(a);
+    a -= 5;
+    write(a)
+end.

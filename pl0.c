@@ -338,7 +338,6 @@ int getsym() {
                             if (ch == '=') {         /* 检测加法赋值符号 */
                                 sym = plusbecomes;
                                 getchdo;
-                                printf("do not support '+='!\n");
                             } else if (ch == '+') {  /* 检测自增符号 */
                                 sym = selfincrease;
                                 getchdo;
@@ -352,7 +351,6 @@ int getsym() {
                             if (ch == '=') {         /* 检测减法赋值符号 */
                                 sym = minusbecomes;
                                 getchdo;
-                                printf("do not support '-='!\n");
                             } else if (ch == '-') {  /* 检测自减符号 */
                                 sym = selfdecrease;
                                 getchdo;
@@ -680,7 +678,12 @@ int statement(bool *fsys, int *ptx, int lev) {
                 i = 0;
             } else {
                 getsymdo;
-                if (sym == becomes) {
+                enum symbol becomesym;
+                if (sym == becomes || sym == plusbecomes || sym == minusbecomes) {
+                    //因为是复合赋值，所以先把当前变量的值放进栈，这样才能按顺序与表达式结果进行运算
+                    if (sym != becomes)
+                        gendo(lod, lev - table[i].level, table[i].adr);
+                    becomesym = sym;
                     getsymdo;
                 } else {
                     error(13); /*没有检测到赋值符号 */
@@ -688,6 +691,16 @@ int statement(bool *fsys, int *ptx, int lev) {
                 memcpy(nxtlev, fsys, sizeof(bool) * symnum);
                 expressiondo(nxtlev, ptx, lev); /*处理赋值符号右侧表达式*/
                 if (i != 0) {
+                    //处理复合运算：表达式结果已在栈顶，当前变量的值已在次栈顶
+                    switch (becomesym) {
+                        case plusbecomes:
+                            gendo(opr, 0, 2);
+                            break;
+                        case minusbecomes:
+                            gendo(opr, 0, 3);
+                            break;
+                        default:;
+                    }
                     /*expression将执行一系列指令，但最终结果将会保存在栈顶，执行 sto命令完成赋值 */
                     gendo(sto, lev - table[i].level, table[i].adr);
                 }
